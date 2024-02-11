@@ -38,9 +38,8 @@ def main():
             print(latest_stamp)
         
         for event in events.find(query):
-            
-            # i dont need the mongo id in the redis database , might as well remove it now
-            del event["_id"] 
+            # remove mongo _id
+            del event["_id"]
 
             # change the latest timestamp 
             latest_stamp = event["timestamp"]
@@ -53,7 +52,7 @@ def main():
             value = json.dumps(event).encode('utf8')
             r.set(key, value)
 
-        sleep(5)
+        sleep(5) #needs to be 30 , for convenience set to 5
 
 if __name__ == '__main__':
     main()
