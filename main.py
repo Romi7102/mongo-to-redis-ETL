@@ -1,15 +1,22 @@
 from datetime import datetime
 from time import sleep
+import os
 import json
 import redis
 from pymongo import MongoClient
 
-def latest_timestamp():
-    r = redis.Redis(host='localhost' , port=6379)
-    latest_timestamp = None
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_CLIENT = redis.Redis(REDIS_HOST , REDIS_PORT)
 
-    for key in r.keys('*'):
-        json_str = r.get(key)
+MONGO_CS = os.environ.get('MONGO_CS')
+MONGO_CLIENT = MongoClient(MONGO_CS)
+
+def latest_timestamp():
+    ret = None
+
+    for key in REDIS_CLIENT.keys('*'):
+        json_str = REDIS_CLIENT.get(key)
         json_obj = json.loads(json_str)
 
         timestamp_string = json_obj['timestamp']
@@ -17,26 +24,21 @@ def latest_timestamp():
         if timestamp_string:
             timestamp = datetime.strptime(timestamp_string, "%Y-%m-%d %H:%M:%S")
 
-            if latest_timestamp is None or timestamp > latest_timestamp:
-                latest_timestamp = timestamp
-    
-    return latest_timestamp
+            if ret is None or timestamp > ret:
+                ret = timestamp
+    return ret
 
 
 def main():
-    #! get from enviroment variables
-    r = redis.Redis(host='localhost' , port=6379)
-    mongo_client = MongoClient('mongodb://admin:admin@localhost:27017')
-    events = mongo_client.testdb.events
+
+    events = MONGO_CLIENT.testdb.events
     latest_stamp = latest_timestamp()
     query = {}
 
     while True:
-
         if latest_stamp:
             query = {"timestamp": {"$gt": latest_stamp}}
             print(latest_stamp)
-        
         for event in events.find(query):
             # remove mongo _id
             del event["_id"]
@@ -50,7 +52,7 @@ def main():
             #insert to redis
             key = f'{event["reporterId"]}:{event["timestamp"]}'
             value = json.dumps(event).encode('utf8')
-            r.set(key, value)
+            REDIS_CLIENT.set(key, value)
 
         sleep(5) #needs to be 30 , for convenience set to 5
 
