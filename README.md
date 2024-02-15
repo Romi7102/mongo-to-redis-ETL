@@ -26,7 +26,7 @@ This Python ETL (Extract, Transform, Load) script pulls data from MongoDB, perfo
 
 3. Run the image with the following environment variables
 
-    ```docker run -e REDIS_HOST=<redis host> -e REDIS_PORT=<redis port> -e MONGO_CS=<mongo connection string> mongo-to-redis-etl```
+    ```docker run -e REDIS_HOST=<redis host> -e REDIS_PORT=<redis port> -e REDIS_LAST=<redis key> -e MONGO_CS=<mongo connection string> -e MONGO_DB=<database name> -e MONGO_COLLECTION=<collection name> -e SLEEP=<time between insertions> mongo-to-redis-etl```
 
     ### Environment Variables
     
@@ -34,7 +34,18 @@ This Python ETL (Extract, Transform, Load) script pulls data from MongoDB, perfo
 
     REDIS_HOST: This environment variable specifies the host address (or IP address) of the Redis server. If Redis is running on the same machine where your Python script is executed, you can typically set this variable to localhost or 127.0.0.1. If Redis is running on a different machine within your network, you would set this variable to the IP address or hostname of that machine.
 
+    REDIS_LAST: This environment variable specifies the redis key that will be used to save the last insertion time of an event to redis.
+
     MONGO_CS: This environment variable specifies the connection URI for your MongoDB database. It should include the protocol (e.g., mongodb://), hostname, port number, and any authentication credentials if required.
+
+    MONGO_DB: This environment variable specifies the database to connect to. 
+
+    MONGO_COLLECTION: This environment variable specifies the collection to pull data from.
+
+    SLEEP: This environment variable specifies the number of seconds to sleep between each insertion.
+
+
+
 
 
 ## Running without docker
