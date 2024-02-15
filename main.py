@@ -4,6 +4,7 @@ import os
 import json
 import redis
 from pymongo import MongoClient
+from pymongo import ASCENDING
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
@@ -27,6 +28,13 @@ def main():
         latest_stamp = latest_stamp.decode('utf8')
         latest_stamp = datetime.strptime(latest_stamp, "%Y-%m-%d %H:%M:%S")
         query = {"timestamp": {"$gt": latest_stamp}}
+
+    # ensure that index exists and if it doesn't exist create it
+    existing_indexes = events.list_indexes()
+    index_name_to_check = "timestamp" 
+    index_exists = any(index["name"] == index_name_to_check for index in existing_indexes)
+    if index_exists is False:
+        events.create_index([("timestamp", ASCENDING)])
 
     while True:
         
