@@ -38,7 +38,7 @@ def main():
 
     while True:
         
-        for event in events.find(query):
+        for event in events.find(query): #todo: redis mset ( multiple keys set)
             # remove mongo _id
             del event["_id"]
 
