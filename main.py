@@ -11,12 +11,8 @@ MONGO_CLIENT = MongoClient(MONGO_CS)
 EVENTS = MONGO_CLIENT[MONGO_DB][MONGO_COLLECTION]
 
 def main():
-
     latest_stamp = REDIS_CLIENT.get(REDIS_LAST)
-    
     index_validation(collection=EVENTS, index_name="timestamp")
-
-    print(latest_stamp)
     query = {}
 
     if latest_stamp is not None:
@@ -24,26 +20,27 @@ def main():
         latest_stamp = datetime.strptime(latest_stamp, DATETIME_FORMAT)
         query = {"timestamp": {"$gt": latest_stamp}}
 
-
     while True:
-        #TODO: change the algorithm to use mset() to set all the keys at once
-        for event in EVENTS.find(query):
-            # remove mongo _id
-            del event["_id"]
+        events = EVENTS.find(query)
+        mapping = {}
 
-            # change the latest timestamp
+        for event in events:
+            # update latest_stamp
             if latest_stamp is None or event["timestamp"] > latest_stamp:
                 latest_stamp = event["timestamp"]
-                REDIS_CLIENT.set(REDIS_LAST, datetime.strftime(event["timestamp"], DATETIME_FORMAT))
-                query = {"timestamp": {"$gt": latest_stamp}}
+                mapping[REDIS_LAST] = datetime.strftime(event["timestamp"], DATETIME_FORMAT)
 
-            # format timestamp to string
-            event["timestamp"] = datetime.strftime(event["timestamp"] ,DATETIME_FORMAT)
+            # format object for later json parsing
+            del event['_id']
+            event["timestamp"] = datetime.strftime(event["timestamp"], DATETIME_FORMAT)
 
-            #insert to redis
+            # create key and json value for mapping
             key = f'{event["reporterId"]}:{event["timestamp"]}'
             value = json.dumps(event).encode(ENCODING)
-            REDIS_CLIENT.set(key, value)
+            mapping[key] = value
+        
+        if len(mapping) > 0:
+            REDIS_CLIENT.mset(mapping)
         sleep(SLEEP) 
 
 if __name__ == '__main__':
