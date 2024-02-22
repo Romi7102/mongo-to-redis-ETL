@@ -40,11 +40,10 @@ def main():
             value = json.dumps(event).encode(ENCODING)
             mapping[key] = value
 
-        
-
         if len(mapping) > 0:
             REDIS_CLIENT.mset(mapping)
-            print(f'inserting {len(mapping)} keys')
+            print(f'inserting {len(mapping)} keys')\
+            
         sleep(SLEEP) 
 
 if __name__ == '__main__':
