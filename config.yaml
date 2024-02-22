@@ -1,19 +1,19 @@
-REDIS_HOST: redis
-REDIS_PORT: 6379
-REDIS_LAST: last
-MONGO_CS: mongodb://admin:admin@mongo:27017
-MONGO_DB: testdb
-MONGO_COLLECTION: events
-SLEEP: 5
-ENCODING: utf-8
-DATETIME_FORMAT: "%Y-%m-%d %H:%M:%S"
-
-# REDIS_HOST: localhost
+# REDIS_HOST: redis
 # REDIS_PORT: 6379
 # REDIS_LAST: last
-# MONGO_CS: mongodb://admin:admin@localhost:27017
-# MONGO_DB: dev
+# MONGO_CS: mongodb://admin:admin@mongo:27017
+# MONGO_DB: testdb
 # MONGO_COLLECTION: events
 # SLEEP: 5
 # ENCODING: utf-8
 # DATETIME_FORMAT: "%Y-%m-%d %H:%M:%S"
+
+REDIS_HOST: localhost
+REDIS_PORT: 6379
+REDIS_LAST: last
+MONGO_CS: mongodb://admin:admin@localhost:27017
+MONGO_DB: dev
+MONGO_COLLECTION: events
+SLEEP: 5
+ENCODING: utf-8
+DATETIME_FORMAT: "%Y-%m-%d %H:%M:%S"
