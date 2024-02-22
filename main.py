@@ -12,7 +12,6 @@ EVENTS = MONGO_CLIENT[MONGO_DB][MONGO_COLLECTION]
 
 def main():
     latest_stamp = REDIS_CLIENT.get(REDIS_LAST)
-    REDIS_CLIENT.exists
     index_validation(collection=EVENTS, index_name="timestamp")
     query = {}
 
@@ -23,7 +22,6 @@ def main():
 
     while True:
         events = EVENTS.find(query)
-        print(events)
         mapping = {}
 
         for event in events:
@@ -41,13 +39,12 @@ def main():
             key = f'{event["reporterId"]}:{event["timestamp"]}'
             value = json.dumps(event).encode(ENCODING)
             mapping[key] = value
+
         
-        print(events)
 
         if len(mapping) > 0:
             REDIS_CLIENT.mset(mapping)
             print(f'inserting {len(mapping)} keys')
-            mapping = {}
         sleep(SLEEP) 
 
 if __name__ == '__main__':
