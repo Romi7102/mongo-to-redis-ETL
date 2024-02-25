@@ -11,8 +11,8 @@ MONGO_CLIENT = MongoClient(MONGO_CS)
 EVENTS = MONGO_CLIENT[MONGO_DB][MONGO_COLLECTION]
 
 def main():
-    latest_stamp = REDIS_CLIENT.get(REDIS_LAST)
     index_validation(collection=EVENTS, index_name="timestamp")
+    latest_stamp = REDIS_CLIENT.get(REDIS_LAST)
     query = {}
 
     if latest_stamp is not None:
@@ -20,11 +20,10 @@ def main():
         latest_stamp = datetime.strptime(latest_stamp, DATETIME_FORMAT)
         query = {"timestamp": {"$gt": latest_stamp}}
 
-    while True:
-        events = EVENTS.find(query)
+    while True:        
         mapping = {}
 
-        for event in events:
+        for event in EVENTS.find(query):
             # update latest_stamp
             if latest_stamp is None or event["timestamp"] > latest_stamp:
                 latest_stamp = event["timestamp"]
@@ -32,7 +31,7 @@ def main():
                 query = {"timestamp": {"$gt": latest_stamp}}
 
             # format object for later json parsing
-            del event['_id']
+            del event['_id'] # remove mongo's _id from event
             event["timestamp"] = datetime.strftime(event["timestamp"], DATETIME_FORMAT)
 
             # create key and json value for mapping
@@ -42,7 +41,9 @@ def main():
 
         if len(mapping) > 0:
             REDIS_CLIENT.mset(mapping)
-            print(f'inserting {len(mapping)} keys')\
+            print(f'inserting {len(mapping)} keys')
+        else:
+            print(f'inserting {len(mapping)} keys')
             
         sleep(SLEEP) 
 
