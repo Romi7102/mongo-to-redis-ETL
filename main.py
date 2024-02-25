@@ -40,10 +40,9 @@ def main():
             mapping[key] = value
 
         if len(mapping) > 0:
-            REDIS_CLIENT.mset(mapping)
-            print(f'inserting {len(mapping)} keys')
-        else:
-            print(f'inserting {len(mapping)} keys')
+            REDIS_CLIENT.mset(mapping)  
+            
+        print(f'inserting {len(mapping)} keys')
             
         sleep(SLEEP) 
 
