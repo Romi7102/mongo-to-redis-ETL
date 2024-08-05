@@ -13,7 +13,7 @@ This Python ETL (Extract, Transform, Load) script pulls data from MongoDB, perfo
 
    `git clone https://github.com/Romi7102/mongo-to-redis-ETL.git`
 
-2. Install the required dependencies ( if running locally and not in docker ):
+2. Install the required dependencies ( required for none docker usage ):
 
    ` pip install -r requirements.txt`
 
